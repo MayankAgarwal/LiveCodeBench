@@ -153,6 +153,28 @@ def format_prompt_execution_base(
             {"role": "user", "content": prompt},
         ]
         return chat_messages
+    elif LanguageModelStyle == LMStyle.Granite:
+        chat_messages = [
+            {
+                "role": "system",
+                "content": system_message,
+            },
+        ]
+        chat_messages += [
+            {"role": "user", "content": prompt},
+        ]
+        from transformers import AutoTokenizer
+
+        tokenizer = AutoTokenizer.from_pretrained(
+            "ibm-granite/granite-34b-code-instruct", padding_side="left", use_fast=False
+        )
+        return tokenizer.apply_chat_template(
+            chat_messages,
+            tokenize=False,
+            add_generation_prompt=True,
+            truncation=False,
+            padding=False,
+        )
     else:
         raise NotImplementedError(
             f"LanguageModelStyle {LanguageModelStyle} not implemented"

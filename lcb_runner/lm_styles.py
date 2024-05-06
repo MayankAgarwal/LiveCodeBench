@@ -26,6 +26,8 @@ class LMStyle(Enum):
 
     LLaMa3 = "LLaMa3"
 
+    Granite = "Granite"
+
 
 @dataclass
 class LanguageModel:
@@ -368,6 +370,13 @@ LanguageModelList: list[LanguageModel] = [
         LMStyle.LLaMa3,
         datetime(2023, 4, 30),
         link="https://huggingface.co/bigcode/starcoder2-instruct-15b-v0.1",
+    ),
+    LanguageModel(
+        "ibm-granite/granite-34b-code-instruct",
+        "Granite-34B-Ins",
+        LMStyle.Granite,
+        datetime(2023, 1, 1),
+        link="https://huggingface.co/ibm-granite/granite-34b-code-instruct",
     ),
 ]
 

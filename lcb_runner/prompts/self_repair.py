@@ -237,6 +237,31 @@ def format_prompt_self_repair(
     elif LanguageModelStyle == LMStyle.Phind:
         prompt = f"### System Prompt\n\n{PromptConstants.SYSTEM_MESSAGE_PHIND}\n\n### User Message\n\n{get_phind_question_template_answer(question, code, result,metadata)}"
         return prompt
+    elif LanguageModelStyle == LMStyle.Granite:
+        chat_messages = [
+            {"role": "system", "content": PromptConstants.SYSTEM_MESSAGE_GENERIC},
+        ]
+        chat_messages += [
+            {
+                "role": "user",
+                "content": get_generic_question_template_answer(
+                    question, code, result, metadata
+                ),
+            },
+        ]
+
+        from transformers import AutoTokenizer
+
+        tokenizer = AutoTokenizer.from_pretrained(
+            "ibm-granite/granite-34b-code-instruct", padding_side="left", use_fast=False
+        )
+        return tokenizer.apply_chat_template(
+            chat_messages,
+            tokenize=False,
+            add_generation_prompt=True,
+            truncation=False,
+            padding=False,
+        )
     else:
         raise NotImplementedError(
             f"LanguageModelStyle {LanguageModelStyle} not implemented"
