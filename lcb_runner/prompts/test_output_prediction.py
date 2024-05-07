@@ -268,7 +268,7 @@ def format_prompt_test_output(
         from transformers import AutoTokenizer
 
         tokenizer = AutoTokenizer.from_pretrained(
-            "ibm-granite/granite-34b-code-instruct", padding_side="left", use_fast=False
+            "ibm-granite/granite-34b-code-instruct", padding_side="left"
         )
         return tokenizer.apply_chat_template(
             chat_messages,

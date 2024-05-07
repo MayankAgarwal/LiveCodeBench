@@ -144,6 +144,32 @@ def get_phind_question_template_answer(question: CodeGenerationProblem):
     return prompt
 
 
+def get_granite_question_template_answer(question: CodeGenerationProblem):
+
+    from transformers import AutoTokenizer
+
+    tokenizer = AutoTokenizer.from_pretrained(
+        "ibm-granite/granite-34b-code-instruct", padding_side="left"
+    )
+
+    prompt = f"{question.question_content}\n\n{PromptConstants.FORMATTING_WITHOUT_STARTER_CODE}"
+
+    messages = [
+        {"role": "system", "content": PromptConstants.SYSTEM_MESSAGE_GENERIC},
+        {"role": "user", "content": prompt},
+        {"role": "assistant", "content": "```python\n"},
+    ]
+
+    prompt = tokenizer.apply_chat_template(
+        messages,
+        tokenizer=False,
+        add_generation_prompt=False,
+        truncation=False,
+        padding=False,
+    )
+    return prompt
+
+
 with open("lcb_runner/prompts/few_shot_examples/generation/func.json") as f:
     func = json.load(f)
 
@@ -315,30 +341,8 @@ def format_prompt_generation(
         return prompt
 
     if LanguageModelStyle == LMStyle.Granite:
-        chat_messages = [
-            {
-                "role": "system",
-                "content": PromptConstants.SYSTEM_MESSAGE_GENERIC,
-            },
-        ]
-        chat_messages += [
-            {
-                "role": "user",
-                "content": get_generic_question_template_answer(question),
-            },
-        ]
-        from transformers import AutoTokenizer
-
-        tokenizer = AutoTokenizer.from_pretrained(
-            "ibm-granite/granite-34b-code-instruct", padding_side="left", use_fast=False
-        )
-        return tokenizer.apply_chat_template(
-            chat_messages,
-            tokenize=False,
-            add_generation_prompt=True,
-            truncation=False,
-            padding=False,
-        )
+        prompt = get_granite_question_template_answer(question)
+        return prompt
 
     raise NotImplementedError(
         f"LanguageModelStyle {LanguageModelStyle} not implemented"
